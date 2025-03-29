@@ -95,5 +95,5 @@ const Router = [
   },
 ];
 
-const router = createBrowserRouter(Router, { basename: '/croche-dashboard' });
+const router = createBrowserRouter(Router, { basename: '/' });
 export default router;
