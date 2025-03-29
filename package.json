@@ -13,6 +13,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.5",
     "@svgr/rollup": "8.1.0",
     "@tabler/icons-react": "^2.39.0",
     "aos": "^2.3.4",
@@ -23,6 +24,7 @@
     "flowbite-react": "^0.10.2",
     "formik": "^2.4.5",
     "formik-mui": "^5.0.0-alpha.0",
+    "graphql": "^16.10.0",
     "gray-matter": "^4.0.3",
     "i18next": "^23.5.1",
     "js-cookie": "^3.0.5",
