@@ -1,8 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { lazy } from 'react';
-import { Navigate, createBrowserRouter } from 'react-router';
+import React, { lazy, useEffect, useState } from 'react';
+import { Navigate, createBrowserRouter, useNavigate } from 'react-router';
 import Loadable from 'src/layouts/full/shared/loadable/Loadable';
+import Cookies from 'js-cookie';
 
 /* ***Layouts**** */
 const FullLayout = Loadable(lazy(() => import('../layouts/full/FullLayout')));
@@ -26,29 +27,69 @@ const Register = Loadable(lazy(() => import('../views/auth/register/Register')))
 const SamplePage = Loadable(lazy(() => import('../views/sample-page/SamplePage')));
 const Error = Loadable(lazy(() => import('../views/auth/error/Error')));
 
+// ProtectedRoute Components using cookies
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const navigate = useNavigate();
+
+  const checkAuth = async () => {
+    try {
+      const authToken = Cookies.get('authToken');
+      if (!authToken) return false;
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    checkAuth().then((authenticated) => {
+      setIsAuthenticated(authenticated);
+      if (!authenticated) {
+        navigate('/auth/login', { replace: true });
+      }
+    });
+  }, [navigate]);
+
+  if (isAuthenticated === null) {
+    return <div>Loading...</div>;
+  }
+  return isAuthenticated ? children : null;
+}
+
 const Router = [
   {
     path: '/',
-    element: <FullLayout />,
+    element: <BlankLayout />,
     children: [
-      { path: '/', exact: true, element: <Dashboard /> },
+      { path: '/', element: <Navigate to="/auth/login" replace /> },
+      { path: '/auth/login', element: <Login /> },
+      { path: '/auth/register', element: <Register /> },
+      { path: '404', element: <Error /> },
+      { path: '/auth/404', element: <Error /> },
+      { path: '*', element: <Navigate to="/auth/404" /> },
+    ],
+  },
+  {
+    path: '/',
+    element: (
+      <ProtectedRoute>
+        <FullLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { path: '/dashboard', exact: true, element: <Dashboard /> },
       { path: '/ui/typography', exact: true, element: <Typography /> },
       { path: '/ui/table', exact: true, element: <Table /> },
       { path: '/ui/form', exact: true, element: <Form /> },
       { path: '/ui/shadow', exact: true, element: <Shadow /> },
       { path: '/icons/solar', exact: true, element: <Solar /> },
       { path: '/sample-page', exact: true, element: <SamplePage /> },
-      { path: '*', element: <Navigate to="/auth/404" /> },
-    ],
-  },
-  {
-    path: '/',
-    element: <BlankLayout />,
-    children: [
-      { path: '/auth/login', element: <Login /> },
-      { path: '/auth/register', element: <Register /> },
-      { path: '404', element: <Error /> },
-      { path: '/auth/404', element: <Error /> },
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },
