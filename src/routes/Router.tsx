@@ -11,6 +11,7 @@ const BlankLayout = Loadable(lazy(() => import('../layouts/blank/BlankLayout')))
 const Dashboard = Loadable(lazy(() => import('../views/dashboards/Dashboard')));
 const UserProfile = Loadable(lazy(() => import('../views/profile/UserProfile')));
 const Products = Loadable(lazy(() => import('../views/products/Products')));
+const EmailVerification = Loadable(lazy(() => import('../views/auth/email-verification/EmailVerification')));
 
 // utilities
 const Typography = Loadable(lazy(() => import('../views/typography/Typography')));
@@ -48,6 +49,10 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   if (!currentUser) {
     return <Navigate to="/auth/login" replace />;
   }
+
+  if (!currentUser.emailVerified) {
+    return <Navigate to="/auth/verify-email" replace />
+  }
   
   // If user is authenticated, render the protected content
   return <>{children}</>;
@@ -61,6 +66,7 @@ const Router = [
       { path: '/', element: <Navigate to="/auth/login" replace /> },
       { path: '/auth/login', element: <Login /> },
       { path: '/auth/register', element: <Register /> },
+      { path: '/auth/verify-email', element: <EmailVerification /> },
       { path: '404', element: <Error /> },
       { path: '/auth/404', element: <Error /> },
       { path: '*', element: <Navigate to="/auth/404" /> },

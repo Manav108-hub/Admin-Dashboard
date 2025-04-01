@@ -15,7 +15,6 @@ import {
       if (userSnap.exists()) {
         return userSnap.data() as UserProfile;
       } else {
-        console.log('No profile found for this user');
         return null;
       }
     } catch (error) {

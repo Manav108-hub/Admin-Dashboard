@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Button, Label, TextInput } from "flowbite-react";
+import { Button, Label, TextInput, Alert } from "flowbite-react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../../../contexts/AuthContext";
 import { FaGoogle } from "react-icons/fa";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../../firebase/config";
+import { sendEmailVerification } from "firebase/auth";
 
 const AuthRegister: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const AuthRegister: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [verificationSent, setVerificationSent] = useState<boolean>(false);
   
   const validateForm = () => {
     clearError();
@@ -49,6 +51,7 @@ const AuthRegister: React.FC = () => {
       await setDoc(doc(db, 'users', userId), {
         name,
         email,
+        emailVerified: false,
         createdAt: new Date()
       });
     } catch (error) {
@@ -68,10 +71,15 @@ const AuthRegister: React.FC = () => {
     try {
       const result = await signUp(email, password);
       if (result.user) {
+        // Send email verification
+        await sendEmailVerification(result.user);
+        setVerificationSent(true);
+        
         // Save additional user data to Firestore
         await saveUserDataToFirestore(result.user.uid);
+        
+        // Don't navigate to dashboard yet - wait for verification
       }
-      navigate('/dashboard');
     } catch (error: any) {
       console.error('Registration failed:', error);
     } finally {
@@ -85,17 +93,45 @@ const AuthRegister: React.FC = () => {
     
     try {
       const result = await loginWithGoogle();
-      if (result.user && result.user.metadata.creationTime === result.user.metadata.lastSignInTime) {
-        // User was just created with Google, save additional data
-        await saveUserDataToFirestore(result.user.uid);
+      if (result.user) {
+        const isNewUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
+        
+        if (isNewUser) {
+          // User was just created with Google, save additional data
+          await saveUserDataToFirestore(result.user.uid);
+        }
+        
+        // Google authentication already verifies email, so we can navigate directly
+        navigate('/dashboard');
       }
-      navigate('/dashboard');
     } catch (error) {
       console.error('Google registration failed:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
+  
+  if (verificationSent) {
+    return (
+      <div className="text-center">
+        <Alert color="info" className="mb-4">
+          <h3 className="text-lg font-medium">Verification Email Sent!</h3>
+          <p>We've sent a verification email to <strong>{email}</strong></p>
+        </Alert>
+        
+        <p className="mb-4">
+          Please check your inbox and click the verification link to activate your account.
+          If you don't see the email, check your spam folder.
+        </p>
+        
+        <div className="mt-6">
+          <Button color="primary" onClick={() => navigate('/login')}>
+            Go to Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <>

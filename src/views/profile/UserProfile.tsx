@@ -73,7 +73,6 @@ const Profile: React.FC = () => {
         }
       }
     } catch (err: any) {
-      console.error('Error fetching profile:', err);
       setError(err.message || 'Failed to load profile');
     } finally {
       setLoading(false);
@@ -160,7 +159,6 @@ const Profile: React.FC = () => {
 
       setFormData(prev => ({ ...prev, profilePictureUrl: imageUrl }));
     } catch (err: any) {
-      console.error('Profile picture upload failed:', err);
       setUploadError(err.message || 'Failed to upload image. Please try again.');
     } finally {
       setIsUploading(false);
@@ -205,7 +203,6 @@ const Profile: React.FC = () => {
       setUserProfile(updatedProfile);
       setIsEditing(false);
     } catch (err: any) {
-      console.error('Error updating profile:', err);
       setError(err.message || 'Failed to update profile');
     } finally {
       setLoading(false);
@@ -249,7 +246,6 @@ const Profile: React.FC = () => {
 
       setFormData(prev => ({ ...prev, profilePictureUrl: null }));
     } catch (err: any) {
-      console.error('Failed to remove profile picture:', err);
       setUploadError(err.message || 'Failed to remove image. Please try again.');
     } finally {
       setIsUploading(false);

@@ -149,7 +149,7 @@ const ProductManagement: React.FC = () => {
                         </div>
                         </div>
                     </Table.Cell>
-                    <Table.Cell>${product.price.toFixed(2)}</Table.Cell>
+                    <Table.Cell>₹{product.price.toFixed(2)}</Table.Cell>
                     <Table.Cell>
                         <Badge color={product.stockQuantity > 0 ? 'success' : 'failure'}>
                         {product.stockQuantity}

@@ -14,8 +14,6 @@ const storage = getStorage();
  */
 export const uploadImage = async (file: File, folder: string = 'profile-pictures'): Promise<string> => {
   try {
-    console.log('Starting file upload to Firebase Storage...');
-    
     // Generate a unique file name
     const fileExtension = file.name.split('.').pop();
     const uniqueFileName = `${uuidv4()}.${fileExtension}`;
@@ -26,18 +24,14 @@ export const uploadImage = async (file: File, folder: string = 'profile-pictures
       ? `${folder}/${userId}/${uniqueFileName}` 
       : `${folder}/${uniqueFileName}`;
     
-    console.log(`Generated unique file path: ${filePath}`);
-    
     // Create a reference to the file location
     const storageRef = ref(storage, filePath);
     
     // Upload the file
     const snapshot = await uploadBytes(storageRef, file);
-    console.log('Firebase upload successful:', snapshot.metadata.name);
     
     // Get the download URL
     const downloadURL = await getDownloadURL(snapshot.ref);
-    console.log('File available at:', downloadURL);
     
     return downloadURL;
   } catch (error) {
@@ -64,14 +58,11 @@ export const deleteImage = async (fileUrl: string): Promise<void> => {
     const url = new URL(fileUrl);
     const fullPath = decodeURIComponent(url.pathname.split('/o/')[1].split('?')[0]);
     
-    console.log(`Attempting to delete file: ${fullPath}`);
-    
     // Create a reference to the file
     const fileRef = ref(storage, fullPath);
     
     // Delete the file
     await deleteObject(fileRef);
-    console.log('File deleted successfully');
   } catch (error) {
     console.error('Error deleting file from Firebase Storage:', error);
     throw error;
