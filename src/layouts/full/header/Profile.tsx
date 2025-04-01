@@ -12,7 +12,7 @@ const Profile = () => {
   const { logout, currentUser } = useAuth();
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [, setLoading] = useState<boolean>(true);
 
   const handleLogout = async () => {
     try {
