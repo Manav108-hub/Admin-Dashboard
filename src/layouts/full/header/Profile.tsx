@@ -4,10 +4,15 @@ import { Icon } from "@iconify/react";
 import user1 from "/src/assets/images/profile/user-1.jpg";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "src/contexts/AuthContext";
+import { getUserProfile } from "src/services/userProfileServices";
+import { UserProfile } from "src/types/profile/user";
+import { useEffect, useState } from "react";
 
 const Profile = () => {
-  const { logout } = useAuth();
+  const { logout, currentUser } = useAuth();
   const navigate = useNavigate();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const handleLogout = async () => {
     try {
@@ -17,6 +22,22 @@ const Profile = () => {
       console.log('Logout failed', error);
     }
   };
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if(!currentUser) return;
+      try {
+        setLoading(true);
+        const profile = await getUserProfile(currentUser.uid);
+        setUserProfile(profile);
+      } catch (error) {
+        console.log('Error fetching profile:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserProfile();
+  }, [currentUser]);
   return (
     <div className="relative group/menu">
       <Dropdown
@@ -26,7 +47,9 @@ const Profile = () => {
         renderTrigger={() => (
           <span className="h-10 w-10 hover:text-primary hover:bg-lightprimary rounded-full flex justify-center items-center cursor-pointer group-hover/menu:bg-lightprimary group-hover/menu:text-primary">
             <img
-              src={user1}
+              src={
+                userProfile?.profilePictureUrl || user1
+              }
               alt="logo"
               height="35"
               width="35"
@@ -38,7 +61,7 @@ const Profile = () => {
 
         <Dropdown.Item
           as={Link}
-          to="#"
+          to="/profile"
           className="px-3 py-3 flex items-center bg-hover group/link w-full gap-3 text-dark"
         >
           <Icon icon="solar:user-circle-outline" height={20} />
