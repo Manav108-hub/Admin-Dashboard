@@ -34,6 +34,17 @@ const SidebarContent: MenuItem[] = [
     ],
   },
   {
+    heading: "PRODUCTS",
+    children: [
+      {
+        name: "Projects",
+        icon: "solar:bag-2-linear",
+        id: uniqueId(),
+        url: "/products",
+      }
+    ]
+  },
+  {
     heading: "UTILITIES",
     children: [
       {

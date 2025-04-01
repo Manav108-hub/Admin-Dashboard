@@ -10,6 +10,7 @@ const BlankLayout = Loadable(lazy(() => import('../layouts/blank/BlankLayout')))
 // Dashboard
 const Dashboard = Loadable(lazy(() => import('../views/dashboards/Dashboard')));
 const UserProfile = Loadable(lazy(() => import('../views/profile/UserProfile')));
+const Products = Loadable(lazy(() => import('../views/products/Products')));
 
 // utilities
 const Typography = Loadable(lazy(() => import('../views/typography/Typography')));
@@ -74,7 +75,8 @@ const Router = [
     ),
     children: [
       { path: '/dashboard', exact: true, element: <Dashboard /> },
-      { path: 'profile', exact: true, element: <UserProfile /> },
+      { path: '/profile', exact: true, element: <UserProfile /> },
+      { path: '/products', exact: true, element: <Products /> },
       { path: '/ui/typography', exact: true, element: <Typography /> },
       { path: '/ui/table', exact: true, element: <Table /> },
       { path: '/ui/form', exact: true, element: <Form /> },
