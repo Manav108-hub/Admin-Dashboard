@@ -1,7 +1,8 @@
-
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router";
 import FullLogo from "src/layouts/full/shared/logo/FullLogo";
 import AuthRegister from "../authforms/AuthRegister";
-import { Link } from "react-router";
+import { useAuth } from "src/contexts/AuthContext";
 
 const gradientStyle = {
   background: "linear-gradient(45deg, rgb(238, 119, 82,0.2), rgb(231, 60, 126,0.2), rgb(35, 166, 213,0.2), rgb(35, 213, 171,0.2))",
@@ -11,7 +12,26 @@ const gradientStyle = {
   overflow: "hidden",
 };
 
-const Register = () => {
+const Register: React.FC = () => {
+  const { currentUser, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (currentUser && !isLoading) {
+      navigate('/auth/login');
+    }
+  }, [currentUser, isLoading, navigate]);
+
+  // If still loading auth state, show a spinner
+  if (isLoading) {
+    return (
+      <div style={gradientStyle} className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div style={gradientStyle} className="relative overflow-hidden h-screen">
       <div className="flex h-full justify-center items-center px-4">

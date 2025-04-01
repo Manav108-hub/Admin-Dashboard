@@ -1,9 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import React, { lazy, useEffect, useState } from 'react';
-import { Navigate, createBrowserRouter, useNavigate } from 'react-router';
+import React, { lazy } from 'react';
+import { Navigate, createBrowserRouter } from 'react-router';
 import Loadable from 'src/layouts/full/shared/loadable/Loadable';
-import Cookies from 'js-cookie';
+import { useAuth } from 'src/contexts/AuthContext';
 
 /* ***Layouts**** */
 const FullLayout = Loadable(lazy(() => import('../layouts/full/FullLayout')));
@@ -27,40 +25,31 @@ const Register = Loadable(lazy(() => import('../views/auth/register/Register')))
 const SamplePage = Loadable(lazy(() => import('../views/sample-page/SamplePage')));
 const Error = Loadable(lazy(() => import('../views/auth/error/Error')));
 
-// ProtectedRoute Components using cookies
-
+// Firebase Auth Protected Route
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const navigate = useNavigate();
-
-  const checkAuth = async () => {
-    try {
-      const authToken = Cookies.get('authToken');
-      if (!authToken) return false;
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  useEffect(() => {
-    checkAuth().then((authenticated) => {
-      setIsAuthenticated(authenticated);
-      if (!authenticated) {
-        navigate('/auth/login', { replace: true });
-      }
-    });
-  }, [navigate]);
-
-  if (isAuthenticated === null) {
-    return <div>Loading...</div>;
+  const { currentUser, isLoading } = useAuth();
+  
+  // If auth is still loading, show a spinner
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
   }
-  return isAuthenticated ? children : null;
-}
+  
+  // If user is not authenticated, redirect to login
+  if (!currentUser) {
+    return <Navigate to="/auth/login" replace />;
+  }
+  
+  // If user is authenticated, render the protected content
+  return <>{children}</>;
+};
 
 const Router = [
   {
