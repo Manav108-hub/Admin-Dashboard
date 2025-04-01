@@ -33,14 +33,4 @@ export default defineConfig({
   },
 
   plugins: [svgr(), react()],
-  server: {
-    proxy: {
-      '/b2api': {
-        target: 'https://api.backblazeb2.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/b2api/, ''),
-        secure: true,
-      },
-    },
-  },
 });
